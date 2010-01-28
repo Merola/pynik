@@ -7,6 +7,7 @@ import favorites
 import commands
 import utility
 import traceback
+import settings
 
 class CommandCatcherPlugin(Plugin): 
 	hooks = ['on_privmsg']   
@@ -66,7 +67,7 @@ class CommandCatcherPlugin(Plugin):
 	
 	def on_privmsg(self, bot, source, target, message):
 		m = re.match(r'^(\S)((\S+)\s?(.*?))$', message)
-		if m and m.group(1) == '.':
+		if m and m.group(1) == settings.command_prefix:
 			body = m.group(2)
 			if body[0] == '(':
 				trigger = "lisp"
