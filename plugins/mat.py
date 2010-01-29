@@ -7,6 +7,8 @@ import utility
 from commands import Command
 from datetime import datetime
 
+import error_handler
+
 def menu(location):
 	# Set location-specific settings
 	if location == "[hg]" or location == "hg":
@@ -105,7 +107,7 @@ def menu(location):
 			if not dish_name:
 				pass # Odd input or bad regex
 			elif dish_name.find(">") != -1:
-				print "Hmm, I got an odd dish from " + location + ": " + dish_name
+				error_handler.output_string("Hmm, 'mat' got an odd dish from " + location + ": " + dish_name)
 			elif dish[dish_price_index]:
 				# Price found, let's add it
 				dishes.append(dish_name + " (" + dish[dish_price_index] + " kr)")

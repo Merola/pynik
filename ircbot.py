@@ -4,6 +4,8 @@ import sys
 import traceback
 import datetime
 
+import error_handler
+
 plugin_handler.plugins_on_load()
 
 from heapq import heappush, heappop
@@ -65,7 +67,7 @@ class IRCBot:
 			except KeyError:
 				pass
 			except:
-				print "argh", plugin, sys.exc_info(), traceback.extract_tb(sys.exc_info()[2])
+				error_handler.output_string("argh " + str(plugin) + " " + str(sys.exc_info()) + " " + str(traceback.extract_tb(sys.exc_info()[2])))
 	
 	def on_connected(self):
 		self.execute_plugins("on_connected")
@@ -114,7 +116,7 @@ class IRCBot:
 		now = datetime.datetime.now()
 
 		if not self.timer_heap.empty() and not self.client.connected:
-			print "ATTENTION! We are not connected. Skipping timers!"
+			error_handler.output_string("ATTENTION! We are not connected. Skipping timers!")
 		else:
 			while not self.timer_heap.empty() and self.timer_heap.top().trigger_time <= now:
 				timer = self.timer_heap.pop()

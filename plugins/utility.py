@@ -9,6 +9,7 @@ import re
 import signal
 import string
 import settings
+import error_handler
 
 class TimeoutException(Exception):
 	pass
@@ -110,7 +111,7 @@ def load_data(name, default_value=None):
 		with open('data/' + name + '.txt', 'r') as handle:
 			return pickle.Unpickler(handle).load()
 	except:
-		print "Could not load data from file 'data/" + str(name) + ".txt' :("
+		error_handler.output_message("Could not load data from file 'data/" + str(name) + ".txt' :(")
 		return default_value
 
 def has_admin_privileges(source, target):

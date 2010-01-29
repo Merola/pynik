@@ -9,6 +9,8 @@ import utility
 import traceback
 import settings
 
+import error_handler
+
 class CommandCatcherPlugin(Plugin): 
 	hooks = ['on_privmsg']   
 
@@ -54,8 +56,8 @@ class CommandCatcherPlugin(Plugin):
 					bolliStr =  ", ".join(map(lambda x: str(x), boll))
 					bot.tell('#botnik', "%s triggered an error by typing \'%s %s\': %s. %s" % (source, trigger, arguments, sys.exc_info(), bolliStr))
 
-					print sys.exc_info()
-					print 'Error when executing command \'', trigger, '\':', traceback.extract_tb(sys.exc_info()[2])
+					error_handler.output_message(str(sys.exc_info()))
+					error_handler.output_message('Error when executing command \'' + trigger + '\':' + str(traceback.extract_tb(sys.exc_info()[2])))
 
 					return "Oops. Error logged."
 			else:

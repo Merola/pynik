@@ -2,6 +2,8 @@ import socket
 import re
 import datetime
 
+import error_handler
+
 import sys
 import threading
 class TimeoutError(Exception): pass
@@ -217,7 +219,7 @@ class HTTPServer:
 		except TimeoutError:
 			client.socket.close()
 		except InvalidRequestException:
-			print "invalid request O.o"
+			error_handler.output_string("invalid request O.o")
 			client.socket.close()
 
 	def tick(self):
