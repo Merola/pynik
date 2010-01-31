@@ -2,6 +2,7 @@
 
 import sys
 import re
+import time
 import utility
 from plugins import Plugin
 from commands import Command
@@ -44,9 +45,16 @@ def get_title(url):
 
 class TitleReaderPlugin(Command):
 	hooks = ['on_privmsg']
-	urls = {}
-	url_list = []
+	last_urls = {}
+	url_lists = {}
 	url_masks = {}
+
+
+	def get_url_list(self, channel):
+		if channel not in self.url_lists:
+			self.url_lists[channel] = []
+		
+		return self.url_lists[channel]
 
 
 	def __init__(self):
@@ -58,19 +66,22 @@ class TitleReaderPlugin(Command):
 
 		if m:
 			url = m.group(1)
-			self.urls[target] = URL()
-			self.urls[target].url = m.group(1)
-			self.urls[target].nick = source
-			self.urls[target].timestamp = 'test'
-			title = get_title(url)
-			self.urls[target].title = title
+			
+			url_obj = URL()
+			url_obj.url = m.group(1)
+			url_obj.nick = source
+			url_obj.timestamp = time.localtime()
+			url_obj.title = get_title(url)
+			
+			self.last_urls[target] = url_obj
 			self.save_last_url(target)
+			
 			if target in ['#c++.se', '#d1d', '#lithen', "#d2006"]:
-				bot.tell(target, self.clean(url, title))
+				bot.tell(target, self.clean(url_obj.url, url_obj.title))
 
 
 	def save_last_url(self, target):
-		self.url_list.append(self.urls[target])
+		self.get_url_list(target).append(self.last_urls[target])
 		self.save_urls()
 
 
@@ -81,14 +92,14 @@ class TitleReaderPlugin(Command):
 		if len(argument) > 0:
 			searchlist = argument.split(' ')
 
-			for object in self.url_list:
+			for url_obj in self.get_url_list(target):
 				match = True
 				for word in searchlist:
-					if not object.is_match(word):
+					if not url_obj.is_match(word):
 						match = False
 						break
 				if match:
-					resultlist.append(object)
+					resultlist.append(url_obj)
 
 			if len(resultlist) > 0:
 				if resultlist[-1].title:
@@ -106,11 +117,11 @@ class TitleReaderPlugin(Command):
 		url = argument.strip()
 		
 		if not url:
-			if target not in self.urls.keys():
+			if target not in self.last_urls.keys():
 				return 'I haven\'t seen any urls here yet.'
 			
-			url = self.urls[target].url
-			title = self.urls[target].title
+			url = self.last_urls[target].url
+			title = self.last_urls[target].title
 			
 		else:
 			title = get_title(argument)
@@ -122,11 +133,11 @@ class TitleReaderPlugin(Command):
 
 
 	def save_urls(self):
-		utility.save_data("urls", self.url_list)
+		utility.save_data("urls", self.url_lists)
 
 
 	def load_urls(self):
-		self.url_list = utility.load_data("urls", [])
+		self.url_lists = utility.load_data("urls", {})
 
 
 	def on_load(self):
