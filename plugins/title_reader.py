@@ -1,7 +1,5 @@
 # coding: utf-8
 
-from __future__ import with_statement
-import pickle
 import sys
 import re
 import utility
@@ -124,18 +122,11 @@ class TitleReaderPlugin(Command):
 
 
 	def save_urls(self):
-		file = open('data/urls.txt', 'w')
-		p = pickle.Pickler(file)
-		p.dump(self.url_list)
-		file.close()
+		utility.save_data("urls", self.url_list)
 
 
 	def load_urls(self):
-		try:
-			with open('data/urls.txt', 'r') as file:
-				self.url_list = pickle.Unpickler(file).load()
-		except IOError:
-			pass
+		self.url_list = utility.load_data("urls", [])
 
 
 	def on_load(self):
@@ -177,18 +168,11 @@ class TitleReaderPlugin(Command):
 
 
 	def mask_load(self):
-		try:
-			with open('data/urlmasks.txt', 'r') as file:
-				self.url_masks = pickle.Unpickler(file).load()
-		except IOError:
-			pass
+		self.url_masks = utility.load_data("urlmasks", {})
 
 
 	def mask_save(self):
-		file = open('data/urlmasks.txt', 'w')
-		p = pickle.Pickler(file)
-		p.dump(self.url_masks)
-		file.close()
+		utility.save_data("urlmasks", self.url_masks)
 
 
 	def trig_titlemask(self, bot, source, target, trigger, argument):
