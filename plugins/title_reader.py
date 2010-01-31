@@ -13,14 +13,19 @@ class URL():
 	title = ''
 	timestamp = ''
 	nick = ''
-	def is_match(self, searchword):
+	
+	def is_exact_match(self, url_string):
+		return self.url and (url_string == self.url)
+	
+	def is_regex_match(self, searchword):
 		if self.url and re.search(searchword, self.url, re.IGNORECASE):
 			return True
-		if self.title and re.search(searchword, self.title, re.IGNORECASE):
+		elif self.title and re.search(searchword, self.title, re.IGNORECASE):
 			return True
-		if self.nick and re.search(searchword, self.nick, re.IGNORECASE):
+		elif self.nick and re.search(searchword, self.nick, re.IGNORECASE):
 			return True
-		return False
+		else:
+			return False
 
 
 def get_title(url):
@@ -73,9 +78,25 @@ class TitleReaderPlugin(Command):
 			url_obj.timestamp = time.localtime()
 			url_obj.title = get_title(url)
 			
+			# Anti-old filter?
+			if target in ['#d1d']:
+				duplicates = self.search_url_list(target, [url_obj.url], False)
+				
+				if len(duplicates) > 0:
+					whine_string = utility.extract_nick(source) + ': OOOLD!!! Already posted '
+					whine_string += str(len(duplicates)) + ' time'
+					if len(duplicates) > 1:
+						whine_string += 's'
+					whine_string += time.strftime(', most recently at %H:%M:%S', duplicates[-1].timestamp)
+					whine_string += ' by ' + utility.extract_nick(duplicates[-1].nick) + ' >:('
+					
+					bot.tell(target, whine_string)
+			
+			# Save URL
 			self.last_urls[target] = url_obj
 			self.save_last_url(target)
 			
+			# Auto-title?
 			if target in ['#c++.se', '#d1d', '#lithen', "#d2006"]:
 				bot.tell(target, self.clean(url_obj.url, url_obj.title))
 
@@ -85,21 +106,32 @@ class TitleReaderPlugin(Command):
 		self.save_urls()
 
 
-	def trig_urlsearch(self, bot, source, target, trigger, argument):
-		resultlist = []
+	def search_url_list(self, channel, word_list, regex=True):
+		results = []
 		match = False
+		
+		for url_obj in self.get_url_list(channel):
+			match = True
+			for word in word_list:
+				if regex:
+					match = url_obj.is_regex_match(word)
+				else:
+					match = url_obj.is_exact_match(word)
+				
+				if not match:
+					break
+				
+			if match:
+				results.append(url_obj)
+		
+		return results
 
+
+	def trig_urlsearch(self, bot, source, target, trigger, argument):
 		if len(argument) > 0:
 			searchlist = argument.split(' ')
 
-			for url_obj in self.get_url_list(target):
-				match = True
-				for word in searchlist:
-					if not url_obj.is_match(word):
-						match = False
-						break
-				if match:
-					resultlist.append(url_obj)
+			resultlist = self.search_url_list(target, searchlist)
 
 			if len(resultlist) > 0:
 				if resultlist[-1].title:
