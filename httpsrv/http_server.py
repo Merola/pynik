@@ -219,7 +219,7 @@ class HTTPServer:
 		except TimeoutError:
 			client.socket.close()
 		except InvalidRequestException:
-			error_handler.output_string("invalid request O.o")
+			error_handler.output_message("[http_server] invalid request O.o")
 			client.socket.close()
 
 	def tick(self):
