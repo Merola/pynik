@@ -2,7 +2,7 @@
 
 import sys
 import re
-import time
+from datetime import datetime
 import utility
 from plugins import Plugin
 from commands import Command
@@ -75,7 +75,7 @@ class TitleReaderPlugin(Command):
 			url_obj = URL()
 			url_obj.url = m.group(1)
 			url_obj.nick = source
-			url_obj.timestamp = time.localtime()
+			url_obj.timestamp = datetime.now()
 			url_obj.title = get_title(url)
 			
 			# Anti-old filter?
