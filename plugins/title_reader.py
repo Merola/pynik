@@ -85,10 +85,16 @@ class TitleReaderPlugin(Command):
 				if len(duplicates) > 0:
 					whine_string = utility.extract_nick(source) + ': OOOLD!!! Already posted '
 					whine_string += str(len(duplicates)) + ' time'
+					
 					if len(duplicates) > 1:
 						whine_string += 's'
-					whine_string += time.strftime(', most recently at %H:%M:%S', duplicates[-1].timestamp)
-					whine_string += ' by ' + utility.extract_nick(duplicates[-1].nick) + ' >:('
+					
+					whine_string += ', most recently by ' + utility.extract_nick(duplicates[-1].nick)
+					
+					if (datetime.now() - duplicates[-1].timestamp).days > 0:
+						whine_string += " (although it was a while ago)"
+					else:
+						whine_string += duplicates[-1].timestamp.strftime(' at %H:%M:%S >:(')
 					
 					bot.tell(target, whine_string)
 			
