@@ -78,7 +78,11 @@ class TitleReaderPlugin(Command):
 			url_obj.url = m.group(1)
 			url_obj.nick = source
 			url_obj.timestamp = datetime.now()
-			url_obj.title = get_title(url)
+			
+			try:
+				url_obj.title = utility.timeout(get_title, 10, (url,))
+			except utility.TimeoutException:
+				return
 			
 			# Anti-old filter?
 			if target in ['#d1d']:
