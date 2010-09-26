@@ -72,7 +72,6 @@ def read_url(url):
 	if m:
 		protocol, address, port, file = m.group(1, 2, 3, 4)
 
-		print protocol
 		if protocol in ['https', 'http']:
 			# Use the built-in functions
 			import urllib
