@@ -72,7 +72,8 @@ def read_url(url):
 	if m:
 		protocol, address, port, file = m.group(1, 2, 3, 4)
 
-		if protocol == 'https':
+		print protocol
+		if protocol in ['https', 'http']:
 			# Use the built-in functions
 			import urllib
 			
@@ -92,6 +93,9 @@ def read_url(url):
 			error_handler.output_message("<httpget> Only http(s) is supported at this moment, cannot get " + url)
 			return None
 		else:
+			# Disabled custom http reader in favor of built-in Python functionality
+			pass
+			
 			if not port:
 				port = 80
 			if not file:
