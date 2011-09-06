@@ -51,14 +51,14 @@ def prisjakt_search(query_string):
 
 		# Get title
 		if url_type == "bok":
-			title_pattern = "class=\\\\\"ikon(14)?\\\\\"( alt=\\\\\"\\\\\")?\> (.+?) \\\\n"
+			title_pattern = "class=\\\\\"ikon(14)?\\\\\"( alt=\\\\\"\\\\\")?\> (.+?) ?\\\\n"
 			title_match = re.search(title_pattern, data)
 			if title_match:
 				encoded_title = title_match.group(3)
 			else:
 				encoded_title = "Unknown title"
 		else:
-			title_pattern = "onmouseout=\\\\\"ajaxpopup_hide\(\);\\\\\"\>\\\\n  (.+?)\\\\n"
+			title_pattern = "onmouseout=\\\\\"ajaxpopup_hide\(\);\\\\\"\>\\\\n  (.+?) ?\\\\n"
 			title_match = re.search(title_pattern, data)
 			if title_match:
 				encoded_title = title_match.group(1)
